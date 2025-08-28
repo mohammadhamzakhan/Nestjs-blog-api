@@ -41,3 +41,4 @@ EXPOSE 3000
 
 # Run Prisma migrations and then start the app
 CMD npx prisma migrate deploy && node dist/main.js
+
