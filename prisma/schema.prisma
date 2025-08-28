@@ -1,0 +1,74 @@
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User{
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  email String @unique
+  password String
+  profileImageUrl String?
+  hashedRefreshTokon String?
+
+  role Role @default(USER)
+
+  blog Blog[]
+  comments Comments[]
+  @@map("users")
+}
+
+model Blog{
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.VarChar(255)
+  content String @db.Text
+  slug String @unique @db.VarChar(255)
+  isDeleted Boolean @default(false)
+  featureImageUrl String? @db.VarChar(500)
+
+  authorId Int
+  user User @relation(fields: [authorId], references: [id])
+
+  comment Comments[]
+  @@map("blogs")
+  @@index([authorId])
+  @@index([slug])
+}
+
+model Comments{
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  email String?
+  comment String
+
+  userId Int?
+  user User? @relation(fields: [userId], references: [id])
+
+  blogId Int
+  blog Blog @relation(fields: [blogId], references: [id])
+
+  @@map("comments")
+  @@index([blogId])
+  @@index([userId])
+}
+
+enum Role{
+  ADMIN
+  USER
+}

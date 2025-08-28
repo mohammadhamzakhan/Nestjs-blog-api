@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name     String
+  email    String @unique
+  password String
+
+  role Role @default(ADMIN)
+
+  blog Blog[]
+
+  @@map("users")
+}
+
+model Blog {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title     String
+  content   String
+  slug      String  @unique
+  isDeleted Boolean @default(false)
+
+  authorId Int
+  user     User @relation(fields: [authorId], references: [id])
+
+  comment Comments[]
+
+  @@index([authorId])
+  @@index([slug])
+  @@map("blogs")
+}
+
+model Comments {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name    String
+  email   String?
+  comment String
+
+  blogId Int
+  blog   Blog @relation(fields: [blogId], references: [id])
+
+  @@index([blogId])
+  @@map("comments")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
