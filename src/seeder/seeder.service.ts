@@ -1,25 +1,30 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { AuthService } from 'src/module/auth/auth.service';
-import { UserService } from 'src/module/user/user.service';
+import { PrismaService } from 'src/module/prisma/prisma.service';
+import * as argon from "argon2";
 
 @Injectable()
 export class SeederService implements OnModuleInit {
     constructor(
-        private userService: UserService,
-        private authService: AuthService,
+        private prisma: PrismaService,
+
     ) { }
     async onModuleInit() {
-        const admin = await this.userService.findByRole('ADMIN');
-        if (!admin) {
-            await this.authService.signUp({
+
+        await this.prisma.user.upsert({
+            where: { email: 'hamza@gmail.com' },
+            update: {},
+            create: {
                 name: 'Hamza Ali',
                 email: 'hamza@gmail.com',
-                password: 'hamzaali',
+                password: await argon.hash('hamzaali', {
+                    type: argon.argon2d,
+                }),
 
                 role: Role.ADMIN,
-            });
-            console.log('First Admin is created');
-        }
+            }
+        });
+        console.log('First Admin is created');
+
     }
 }

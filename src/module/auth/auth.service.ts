@@ -16,12 +16,12 @@ export class AuthService {
     ) { }
 
     async signUp(dto: signUpDto): Promise<AuthResponse> {
-        const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+        const existing = await this.prisma.user.findFirst({ where: { email: dto.email } });
+        if (existing) throw new ForbiddenException("User Already Exist");
         const hash = await argon.hash(dto.password, {
             type: argon.argon2id,
             memoryCost: 19456,
             timeCost: 2,
-            parallelism: 1,
 
         });
         const user = await this.prisma.user.create({ data: { ...dto, password: hash } });
