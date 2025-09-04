@@ -97,7 +97,7 @@ export class AuthService {
         if (!user || !user.hashedRefreshTokon) throw new ForbiddenException("Access Denied");
 
         const ok = await argon.verify(user.hashedRefreshTokon, refreshToken);
-        if (!ok) throw new ForbiddenException("Not verified");
+        if (!ok) throw new ForbiddenException("Your token is not verified or your token changed, Please sign in again!!");
 
         //===Rotate token 
         const token = this.signToken(user.id, user.email);
