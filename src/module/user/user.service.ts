@@ -35,7 +35,7 @@ export class UserService {
 
     //===========================FOR ALL USERS================================
     async getCurrentUser(userId: number): Promise<UserEntity> {
-        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { blog: { include: { user: { select: { id: true, name: true, } } } } } });
 
         return new UserEntity(user!);
     }
@@ -56,7 +56,7 @@ export class UserService {
         await this.prisma.user.delete({ where: { id: userId } });
 
         return {
-            success: 'User Delete Successfull',
+            message: 'User Delete Successfull',
         };
     }
 }

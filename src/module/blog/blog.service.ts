@@ -42,7 +42,7 @@ export class BlogService {
 
     //==>Get Blogs
     async getBlogs(authorId: number) {
-        const blogs = await this.prisma.blog.findMany({ where: { authorId } });
+        const blogs = await this.prisma.blog.findMany({ where: { authorId }, include: { user: { select: { id: true, name: true, } } } });
         if (blogs.length === 0) throw new NotFoundException('No Blogs Found!!! Create your blog');
         return blogs;
     }
